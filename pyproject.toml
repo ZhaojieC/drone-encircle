@@ -1,0 +1,38 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "drone-encircle"
+version = "0.0.1"
+description = "Prototype: drones encircling a target, modelled as particles"
+requires-python = ">=3.12"
+dependencies = [
+  "particlegym @ git+https://github.com/ZhaojieC/particlegym@main",
+  "jax>=0.4.30",
+  "numpy>=1.26",
+  "matplotlib>=3.8",
+  "pillow>=10",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["encircle"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 99
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "NPY", "SIM", "RUF"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["encircle"]

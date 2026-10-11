@@ -1,0 +1,101 @@
+[
+  {
+    "case": "1 drone",
+    "drones": 1,
+    "convergence_time_s": 15.800024032592773,
+    "radial_rms_m": 0.08870729058980942,
+    "spacing_cv": NaN,
+    "min_distance_m": NaN,
+    "max_speed_mps": 6.052505016326904
+  },
+  {
+    "case": "2 drones",
+    "drones": 2,
+    "convergence_time_s": 23.000051498413086,
+    "radial_rms_m": 0.08870730549097061,
+    "spacing_cv": 5.091672150570048e-08,
+    "min_distance_m": 3.8074891567230225,
+    "max_speed_mps": 7.977692604064941
+  },
+  {
+    "case": "3 drones",
+    "drones": 3,
+    "convergence_time_s": 27.50006866455078,
+    "radial_rms_m": 0.0887080505490303,
+    "spacing_cv": 1.2838265206482902e-07,
+    "min_distance_m": 2.9033243656158447,
+    "max_speed_mps": 7.978199481964111
+  },
+  {
+    "case": "4 drones",
+    "drones": 4,
+    "convergence_time_s": 30.300079345703125,
+    "radial_rms_m": 0.08871418982744217,
+    "spacing_cv": 9.938119660546363e-08,
+    "min_distance_m": 2.9003827571868896,
+    "max_speed_mps": 7.978487968444824
+  },
+  {
+    "case": "5 drones",
+    "drones": 5,
+    "convergence_time_s": 31.500083923339844,
+    "radial_rms_m": 0.08870940655469894,
+    "spacing_cv": 2.4953331489996344e-07,
+    "min_distance_m": 2.8771440982818604,
+    "max_speed_mps": 7.977726936340332
+  },
+  {
+    "case": "6 drones",
+    "drones": 6,
+    "convergence_time_s": 34.700042724609375,
+    "radial_rms_m": 0.08870931714773178,
+    "spacing_cv": 2.879573628433718e-07,
+    "min_distance_m": 2.746049404144287,
+    "max_speed_mps": 7.9776835441589355
+  },
+  {
+    "case": "7 drones",
+    "drones": 7,
+    "convergence_time_s": 37.69999694824219,
+    "radial_rms_m": 0.08870695531368256,
+    "spacing_cv": 4.21792663019005e-07,
+    "min_distance_m": 2.7100026607513428,
+    "max_speed_mps": 7.977856159210205
+  },
+  {
+    "case": "8 drones",
+    "drones": 8,
+    "convergence_time_s": 41.79993438720703,
+    "radial_rms_m": 0.08870647102594376,
+    "spacing_cv": 6.815849246777361e-06,
+    "min_distance_m": 2.246609926223755,
+    "max_speed_mps": 7.977560043334961
+  },
+  {
+    "case": "8 drones, gusts 0.3 m/s",
+    "drones": 8,
+    "convergence_time_s": 40.89994812011719,
+    "radial_rms_m": 0.2778976857662201,
+    "spacing_cv": 0.023656103760004044,
+    "min_distance_m": 2.0961740016937256,
+    "max_speed_mps": 8.376291275024414
+  },
+  {
+    "case": "8 drones, target moving at 2 m/s",
+    "drones": 8,
+    "convergence_time_s": 45.29988098144531,
+    "radial_rms_m": 0.08870456367731094,
+    "spacing_cv": 1.5412426364491694e-05,
+    "min_distance_m": 2.2472920417785645,
+    "max_speed_mps": 7.996067523956299
+  },
+  {
+    "case": "8 drones, gusts and moving target",
+    "drones": 8,
+    "convergence_time_s": 46.29986572265625,
+    "radial_rms_m": 0.2922523021697998,
+    "spacing_cv": 0.025360776111483574,
+    "min_distance_m": 2.394618034362793,
+    "max_speed_mps": 8.469279289245605
+  }
+]
