@@ -234,6 +234,25 @@ pytest                                     # tests
   communication limits.
 - No policy has been trained yet.
 
+## Open questions
+
+The orbit, the speed limits and the response time are assumptions (R = 20 m,
+10 m above the target, 8 m/s horizontal and 3 m/s vertical, τ = 0.5 s). To
+replace them with the real task we need to know:
+
+1. Which vehicle: its size, its speed and climb limits, and how fast it
+   follows a velocity command.
+2. What the policy should output: velocity setpoints, as here, or
+   accelerations, attitude and thrust, or waypoints.
+3. Which simulator is used now, and how many environment steps per second it
+   gives in training.
+4. What each drone can sense and what the drones can tell each other: the
+   position of the target and of the other drones, with which noise, delay and
+   range.
+5. How the target moves: at rest, at constant velocity, or manoeuvring.
+6. What counts as success: the orbit radius and height, the spacing tolerance,
+   the minimum separation, the time limit.
+
 ## Next steps
 
 1. Train a shared residual policy (PPO, all in JAX) on 1 to 8 drones and compare
