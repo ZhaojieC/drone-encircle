@@ -6,6 +6,10 @@ build-backend = "hatchling.build"
 name = "drone-encircle"
 version = "0.0.1"
 description = "Prototype: drones encircling a target, modelled as particles"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Zhaojie Chai" }]
 requires-python = ">=3.12"
 dependencies = [
   "particlegym @ git+https://github.com/ZhaojieC/particlegym@main",

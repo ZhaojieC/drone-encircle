@@ -2,11 +2,10 @@
 
 Drones are blue, the target is red, the orbit is the dark ring (the grey ring
 is its projection on the ground), and thin lines trace the paths of the
-drones. The camera is fixed. Run with a Python that has
-the `ovito` package, for example on Oscar:
+drones. The camera is fixed. Run with a Python that has the `ovito` package;
+without a display:
 
-    QT_QPA_PLATFORM=offscreen env -u LD_LIBRARY_PATH -u PYTHONPATH \
-        /oscar/data/gk/zchai5/envs/ovito/bin/python scripts/render_ovito.py scene [--still FRAME]
+    QT_QPA_PLATFORM=offscreen python scripts/render_ovito.py scene [--still FRAME]
 
 The frames are written to scene/frames/; join them with
 

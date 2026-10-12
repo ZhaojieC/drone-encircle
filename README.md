@@ -185,7 +185,7 @@ Environment steps per second with JAX 0.11.2 (`python scripts/bench_env.py`).
 The numbers are for the environment alone, with zero actions; a policy network
 and its training are not included.
 
-12 cores of an AMD EPYC 7662 on Oscar (`bench_cpu_oscar.txt`):
+12 cores of an AMD EPYC 7662 (`bench_cpu_oscar.txt`):
 
 | Parallel environments | 2D | 3D |
 |---|---|---|
@@ -194,7 +194,7 @@ and its training are not included.
 | 512 | 97,725 | 81,957 |
 | 4,096 | 229,048 | 173,894 |
 
-One NVIDIA L40S GPU on Oscar (`bench_gpu_oscar.txt`):
+One NVIDIA L40S GPU (`bench_gpu_oscar.txt`):
 
 | Parallel environments | 2D | 3D |
 |---|---|---|
@@ -234,23 +234,22 @@ pytest                                     # tests
   communication limits.
 - No policy has been trained yet.
 
-## Open questions
+## Assumptions
 
 The orbit, the speed limits and the response time are assumptions (R = 20 m,
-10 m above the target, 8 m/s horizontal and 3 m/s vertical, τ = 0.5 s). To
-replace them with the real task we need to know:
+10 m above the target, 8 m/s horizontal and 3 m/s vertical, τ = 0.5 s). They
+are not the data of a particular vehicle or mission. To apply the prototype to
+a real task, the following has to be specified:
 
-1. Which vehicle: its size, its speed and climb limits, and how fast it
-   follows a velocity command.
-2. What the policy should output: velocity setpoints, as here, or
-   accelerations, attitude and thrust, or waypoints.
-3. Which simulator is used now, and how many environment steps per second it
-   gives in training.
-4. What each drone can sense and what the drones can tell each other: the
+1. The vehicle: its size, its speed and climb limits, and how fast it follows
+   a velocity command.
+2. What the policy outputs: velocity setpoints, as here, or accelerations,
+   attitude and thrust, or waypoints.
+3. What each drone can sense and what the drones can tell each other: the
    position of the target and of the other drones, with which noise, delay and
    range.
-5. How the target moves: at rest, at constant velocity, or manoeuvring.
-6. What counts as success: the orbit radius and height, the spacing tolerance,
+4. How the target moves: at rest, at constant velocity, or manoeuvring.
+5. What counts as success: the orbit radius and height, the spacing tolerance,
    the minimum separation, the time limit.
 
 ## Next steps
@@ -271,3 +270,7 @@ replace them with the real task we need to know:
   and Dynamics* 31(2), 290–306 (2008).
 - B. Leimkuhler and C. Matthews, Rational construction of stochastic numerical
   methods for molecular sampling, *Appl. Math. Res. Express* 2013, 34–56 (2013).
+
+## License
+
+MIT; see [LICENSE](LICENSE).
