@@ -20,6 +20,13 @@ encirclement controller with phase balancing and repulsion switched off
 (guidance field, lag compensation, radial feedback, target velocity). A zero
 action then already flies every drone onto the orbit, and the policy only
 has to learn the coordination: spacing and collision avoidance.
+
+``Encircle(dim=3)`` is the same task in 3D: the drones take off at the
+altitude of the target, climb to an orbit of radius ``params.radius`` whose
+centre is ``params.height`` above the target, and circle in the plane normal
+to ``axis`` (horizontal by default). Actions and observations then have three
+components per vector, and the vertical component of an action is in units of
+``max_vertical_speed``.
 """
 
 from __future__ import annotations
@@ -31,7 +38,14 @@ import jax
 import jax.numpy as jnp
 from particlegym import physics as pp
 
-from encircle.controller import EncircleController, angular_gaps
+from encircle.controller import (
+    ORBIT_HEIGHT,
+    VERTICAL,
+    EncircleController,
+    angular_gaps,
+    orbit_coordinates,
+    orbit_frame,
+)
 from encircle.simulate import Scenario
 
 
@@ -48,6 +62,9 @@ class EncircleParams(NamedTuple):
         spacing_weight: Weight of the spacing error in the reward.
         collision_weight: Penalty for being closer than the safe distance.
         max_steps: Episode length in control steps.
+        height: 3D only: height of the orbit centre above the target (m).
+        target_climb: 3D only: vertical speed of the target (m/s);
+            ``target_speed`` is then its horizontal speed.
     """
 
     radius: float = 20.0
@@ -59,12 +76,14 @@ class EncircleParams(NamedTuple):
     spacing_weight: float = 0.5
     collision_weight: float = 5.0
     max_steps: int = 600
+    height: float = ORBIT_HEIGHT
+    target_climb: float = 0.0
 
 
 class EncircleState(NamedTuple):
     particles: pp.ParticleState
-    target: jax.Array  # (2,)
-    target_vel: jax.Array  # (2,)
+    target: jax.Array  # (d,)
+    target_vel: jax.Array  # (d,)
     step: jax.Array
 
 
@@ -84,6 +103,10 @@ class Encircle:
         neighbors: Number of nearest neighbours in each observation.
         residual: Add actions to the guidance-field command instead of using
             them as the full command.
+        dim: Number of dimensions, 2 or 3.
+        max_vertical_speed: 3D only: largest commanded vertical speed (m/s);
+            ``max_speed`` then limits the horizontal speed.
+        axis: 3D only: normal of the orbit plane; vertical for a horizontal orbit.
     """
 
     def __init__(
@@ -99,9 +122,17 @@ class Encircle:
         launch_spacing: float = 4.0,
         neighbors: int = 3,
         residual: bool = True,
+        dim: int = 2,
+        max_vertical_speed: float = 3.0,
+        axis=VERTICAL,
     ) -> None:
         if not 1 <= n_min <= n_max:
             raise ValueError("need 1 <= n_min <= n_max")
+        if dim not in (2, 3):
+            raise ValueError("dim must be 2 or 3")
+        self.dim = int(dim)
+        self.max_vertical_speed = float(max_vertical_speed)
+        self.axis = tuple(float(x) for x in orbit_frame(axis)[2])
         self.n_max, self.n_min = int(n_max), int(n_min)
         self.max_speed, self.tau = float(max_speed), float(tau)
         self.dt, self.substeps = float(dt), int(substeps)
@@ -109,10 +140,11 @@ class Encircle:
         self.launch_distance = float(launch_distance)
         self.neighbors = int(neighbors)
         self.residual = bool(residual)
-        self.field = pp.ForceField(pp.Box((-1e4, -1e4), (1e4, 1e4)))
-        grid = Scenario(n_drones=n_max, launch=(0.0, 0.0), launch_spacing=launch_spacing)
+        self.field = pp.ForceField(pp.Box((-1e4,) * self.dim, (1e4,) * self.dim))
+        grid = Scenario(n_drones=n_max, launch=(0.0, 0.0), launch_spacing=launch_spacing, dim=dim)
         self._launch_offsets = grid.launch_positions()
-        self.observation_size = 4 + 5 * self.neighbors + 1
+        self._action_scale = (self.max_speed, self.max_speed, self.max_vertical_speed)[: self.dim]
+        self.observation_size = 2 * self.dim + (2 * self.dim + 1) * self.neighbors + 1
 
     @property
     def default_params(self) -> EncircleParams:
@@ -129,37 +161,34 @@ class Encircle:
         n_active = jax.random.randint(count_key, (), self.n_min, self.n_max + 1)
         angle = jax.random.uniform(launch_key, (), minval=0.0, maxval=2 * math.pi)
         launch = self.launch_distance * jnp.stack([jnp.cos(angle), jnp.sin(angle)])
+        heading = jax.random.uniform(target_key, (), minval=0.0, maxval=2 * math.pi)
+        target_vel = params.target_speed * jnp.stack([jnp.cos(heading), jnp.sin(heading)])
+        if self.dim == 3:
+            # The launch area is at the altitude of the target, and the target
+            # moves horizontally while it climbs or descends.
+            launch = jnp.append(launch, 0.0)
+            target_vel = jnp.append(target_vel, params.target_climb)
         offsets = jnp.asarray(self._launch_offsets, launch.dtype)
         alive = jnp.arange(self.n_max) < n_active
         particles = pp.create_state(launch + offsets, mass=1.0, radius=0.5, alive=alive)
-        heading = jax.random.uniform(target_key, (), minval=0.0, maxval=2 * math.pi)
-        target_vel = params.target_speed * jnp.stack([jnp.cos(heading), jnp.sin(heading)])
         state = EncircleState(
             particles=particles,
-            target=jnp.zeros(2, launch.dtype),
+            target=jnp.zeros(self.dim, launch.dtype),
             target_vel=target_vel.astype(launch.dtype),
             step=jnp.zeros((), jnp.int32),
         )
         return self.observe(state, params), state
 
     def step(self, key, state: EncircleState, action, params: EncircleParams | None = None):
-        """One control step. ``action`` has shape (n_max, 2), entries in [-1, 1]."""
+        """One control step. ``action`` has shape (n_max, d), entries in [-1, 1]."""
         params = self.default_params if params is None else params
         p = state.particles
-        command = self.max_speed * jnp.clip(jnp.asarray(action, p.pos.dtype), -1.0, 1.0)
+        scale = jnp.asarray(self._action_scale, p.pos.dtype)
+        command = scale * jnp.clip(jnp.asarray(action, p.pos.dtype), -1.0, 1.0)
+        base = self._controller(params)
         if self.residual:
-            base = EncircleController(
-                radius=params.radius,
-                speed=params.speed,
-                max_speed=self.max_speed,
-                phase_gain=0.0,
-                repulsion_speed=0.0,
-                response_time=self.tau,
-            )
             command = command + base(p.pos, state.target, state.target_vel, p.alive)
-        norm = jnp.linalg.norm(command, axis=1, keepdims=True)
-        command = command * jnp.minimum(1.0, self.max_speed / jnp.maximum(norm, 1e-12))
-        command = jnp.where(p.alive[:, None], command, 0.0)
+        command = jnp.where(p.alive[:, None], base.saturate(command), 0.0)
 
         def substep(s, k):
             s, _ = pp.langevin_baoab(
@@ -185,18 +214,34 @@ class Encircle:
         info = {"n_active": jnp.sum(particles.alive)}
         return self.observe(state, params), state, reward, done, info
 
+    def _controller(self, params: EncircleParams) -> EncircleController:
+        """The guidance-field controller without phase balancing and repulsion."""
+        return EncircleController(
+            radius=params.radius,
+            speed=params.speed,
+            max_speed=self.max_speed,
+            phase_gain=0.0,
+            repulsion_speed=0.0,
+            response_time=self.tau,
+            height=params.height,
+            axis=self.axis,
+            max_vertical_speed=self.max_vertical_speed,
+        )
+
     def observe(self, state: EncircleState, params: EncircleParams) -> jax.Array:
         """Observations (n_max, observation_size); rows of inactive drones are zero.
 
-        Per drone: position and velocity relative to the target (scaled by R
-        and max_speed), then for each of the nearest neighbours its relative
-        position, relative velocity and a presence flag, and finally the
-        fraction of active drones.
+        Per drone: position relative to the centre of the orbit (the target in
+        2D) and velocity relative to the target, scaled by R and max_speed;
+        then for each of the nearest neighbours its relative position,
+        relative velocity and a presence flag; and finally the fraction of
+        active drones.
         """
         p = state.particles
         alive = p.alive
+        centre = self._controller(params).orbit_centre(state.target)
         own = jnp.concatenate(
-            [(p.pos - state.target) / params.radius, (p.vel - state.target_vel) / self.max_speed],
+            [(p.pos - centre) / params.radius, (p.vel - state.target_vel) / self.max_speed],
             axis=1,
         )
         diff = p.pos[None, :, :] - p.pos[:, None, :]  # neighbour j relative to drone i
@@ -216,13 +261,22 @@ class Encircle:
         """Per-drone reward (n_max,): 0 is perfect, inactive drones get 0."""
         p = state.particles
         alive = p.alive
-        rel = p.pos - state.target
+        centre = self._controller(params).orbit_centre(state.target)
+        # Position and velocity in the orbit plane, and height above it (0 in 2D).
+        rel, zeta = orbit_coordinates(p.pos - centre, self.axis)
+        vel, _ = orbit_coordinates(p.vel - state.target_vel, self.axis)
         rho = jnp.linalg.norm(rel, axis=1)
         outward = rel / jnp.maximum(rho, 1e-12)[:, None]
         tangent = jnp.stack([-outward[:, 1], outward[:, 0]], axis=1)
-        orbit_speed = jnp.sum((p.vel - state.target_vel) * tangent, axis=1)
+        orbit_speed = jnp.sum(vel * tangent, axis=1)
 
-        radial = -jnp.minimum(jnp.abs(rho / params.radius - 1.0), 2.0)
+        off_orbit = jnp.abs(rho / params.radius - 1.0)
+        if self.dim == 3:
+            # Distance to the orbit, in units of R. The sum is kept positive so
+            # that the square root has a finite derivative on the orbit.
+            square = off_orbit**2 + (zeta / params.radius) ** 2
+            off_orbit = jnp.where(square > 0, jnp.sqrt(jnp.maximum(square, 1e-30)), 0.0)
+        radial = -jnp.minimum(off_orbit, 2.0)
         speed = -jnp.abs(orbit_speed - params.speed) / params.speed
         count = jnp.sum(alive)
         ideal = 2 * math.pi / jnp.maximum(count, 1)

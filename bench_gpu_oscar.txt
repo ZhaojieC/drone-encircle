@@ -1,0 +1,17 @@
+# 2026-10-12, gpu3002, one NVIDIA L40S (Slurm job 7325960, 4 CPU cores)
+# python scripts/bench_env.py --dim D --batches 4096 16384 65536 262144, for D = 2 and 3
+NVIDIA L40S, 46068 MiB
+JAX 0.11.2 on GPU, 2D
+| Parallel environments | Environment steps per second |
+|---|---|
+| 4096 | 76,615,083 |
+| 16384 | 204,692,823 |
+| 65536 | 370,435,125 |
+| 262144 | 39,429,152 |
+JAX 0.11.2 on GPU, 3D
+| Parallel environments | Environment steps per second |
+|---|---|
+| 4096 | 64,737,100 |
+| 16384 | 160,242,113 |
+| 65536 | 290,635,437 |
+| 262144 | 106,700,074 |

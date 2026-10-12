@@ -1,0 +1,15 @@
+# 2026-10-12, gpu2505, 12 cores of AMD EPYC 7662 64-Core Processor
+JAX 0.11.2 on CPU, 2D
+| Parallel environments | Environment steps per second |
+|---|---|
+| 1 | 68,376 |
+| 64 | 108,890 |
+| 512 | 97,725 |
+| 4096 | 229,048 |
+JAX 0.11.2 on CPU, 3D
+| Parallel environments | Environment steps per second |
+|---|---|
+| 1 | 43,815 |
+| 64 | 55,905 |
+| 512 | 81,957 |
+| 4096 | 173,894 |
