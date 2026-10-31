@@ -271,6 +271,18 @@ a real task, the following has to be specified:
 - B. Leimkuhler and C. Matthews, Rational construction of stochastic numerical
   methods for molecular sampling, *Appl. Math. Res. Express* 2013, 34–56 (2013).
 
+## Related publications
+
+ParticleGym grows out of the particle-dynamics environments of
+
+- Y. Zhang, Z. Chai and G. Lykotrafitis, Deep reinforcement learning with a
+  particle dynamics environment applied to emergency evacuation of a room with
+  obstacles, *Physica A* 571, 125845 (2021).
+  https://doi.org/10.1016/j.physa.2021.125845
+- Y. Zhang, Z. Chai, Y. Sun and G. Lykotrafitis, A deep reinforcement learning
+  model based on deterministic policy gradient for collective neural crest cell
+  migration, arXiv:2007.03190 (2020). https://arxiv.org/abs/2007.03190
+
 ## License
 
 MIT; see [LICENSE](LICENSE).
