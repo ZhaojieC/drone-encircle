@@ -262,6 +262,11 @@ a real task, the following has to be specified:
 
 ## References
 
+If you publish results obtained with this code, please cite
+[ParticleGym](https://github.com/ZhaojieC/particlegym) and the papers below.
+The first `Encircle` environment, or the first `simulate` run, of a program
+prints this request once; set `DRONE_ENCIRCLE_CITE=0` to hide it.
+
 - D. A. Lawrence, E. W. Frew and W. J. Pisano, Lyapunov vector fields for
   autonomous unmanned aircraft flight control, *J. Guidance, Control, and
   Dynamics* 31(5), 1220–1229 (2008).

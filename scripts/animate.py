@@ -1,3 +1,5 @@
+# drone-encircle, https://github.com/ZhaojieC/drone-encircle (MIT license).
+# In published work, please cite ParticleGym and the papers in the README's References.
 """Animate 1, 2, 4 and 8 drones flying to a target and encircling it (GIF).
 
 python scripts/animate.py [--output encircle.gif] [--seconds 60]

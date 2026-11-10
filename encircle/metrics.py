@@ -1,3 +1,5 @@
+# drone-encircle, https://github.com/ZhaojieC/drone-encircle (MIT license).
+# In published work, please cite ParticleGym and the papers in the README's References.
 """Mission metrics computed from a recorded trajectory."""
 
 from __future__ import annotations

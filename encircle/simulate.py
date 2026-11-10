@@ -1,3 +1,5 @@
+# drone-encircle, https://github.com/ZhaojieC/drone-encircle (MIT license).
+# In published work, please cite ParticleGym and the papers in the README's References.
 """Closed-loop simulation of drones as particles, using the ParticleGym physics core.
 
 A drone is a point mass whose velocity relaxes to the commanded velocity with
@@ -23,6 +25,7 @@ import jax.numpy as jnp
 import numpy as np
 from particlegym import physics as pp
 
+from encircle.citation import remind
 from encircle.controller import EncircleController
 
 
@@ -99,6 +102,7 @@ class Trajectory(NamedTuple):
 
 def simulate(scenario: Scenario, controller: EncircleController, key=None) -> Trajectory:
     """Run the closed loop: controller -> commanded velocity -> particle dynamics."""
+    remind()
     key = jax.random.key(0) if key is None else key
     box = pp.Box((-1e4,) * scenario.dim, (1e4,) * scenario.dim)
     field = pp.ForceField(box)  # drones do not touch: separation is the controller's job
