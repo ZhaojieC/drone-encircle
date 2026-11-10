@@ -1,3 +1,5 @@
+# drone-encircle, https://github.com/ZhaojieC/drone-encircle (MIT license).
+# In published work, please cite ParticleGym and the papers in the README's References.
 """Render a scene written by scripts/export_scene.py with OVITO (Tachyon renderer).
 
 Drones are blue, the target is red, the orbit is the dark ring (the grey ring

@@ -1,3 +1,5 @@
+# drone-encircle, https://github.com/ZhaojieC/drone-encircle (MIT license).
+# In published work, please cite ParticleGym and the papers in the README's References.
 """Reinforcement-learning environment: drones learn to encircle a target.
 
 Functional and JAX-native, in the style of ParticleGym environments::
@@ -38,6 +40,7 @@ import jax
 import jax.numpy as jnp
 from particlegym import physics as pp
 
+from encircle.citation import remind
 from encircle.controller import (
     ORBIT_HEIGHT,
     VERTICAL,
@@ -145,6 +148,7 @@ class Encircle:
         self._launch_offsets = grid.launch_positions()
         self._action_scale = (self.max_speed, self.max_speed, self.max_vertical_speed)[: self.dim]
         self.observation_size = 2 * self.dim + (2 * self.dim + 1) * self.neighbors + 1
+        remind()
 
     @property
     def default_params(self) -> EncircleParams:

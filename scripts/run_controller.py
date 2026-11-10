@@ -1,3 +1,5 @@
+# drone-encircle, https://github.com/ZhaojieC/drone-encircle (MIT license).
+# In published work, please cite ParticleGym and the papers in the README's References.
 """Run the encirclement controller for 1 to 8 drones and harder cases; print a Markdown table.
 
 python scripts/run_controller.py [--dim 3] [--json results.json]

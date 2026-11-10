@@ -1,3 +1,5 @@
+# drone-encircle, https://github.com/ZhaojieC/drone-encircle (MIT license).
+# In published work, please cite ParticleGym and the papers in the README's References.
 """Throughput of the reinforcement-learning environment with batched environments.
 
 Each environment step is one 0.1 s control step (5 physics substeps) for up to

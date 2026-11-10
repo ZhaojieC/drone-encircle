@@ -1,3 +1,5 @@
+# drone-encircle, https://github.com/ZhaojieC/drone-encircle (MIT license).
+# In published work, please cite ParticleGym and the papers in the README's References.
 """Write a 3D encirclement run as files that OVITO can render.
 
 Writes, into the output directory, the trajectory of the drones and the
